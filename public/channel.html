@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuvis - チャンネル</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.main { padding-top: var(--nav-h); }
+
+.channel-banner {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #1a0a2e, #2a1550, #1a1a3e);
+  position: relative;
+  overflow: hidden;
+}
+
+.channel-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+}
+
+.channel-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.channel-identity {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-top: -48px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.channel-avatar-xl {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #fff;
+  border: 3px solid var(--bg);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.channel-avatar-xl img { width:100%; height:100%; object-fit:cover; }
+
+.channel-identity-info {
+  padding-bottom: 4px;
+}
+
+.channel-name-xl {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.channel-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.channel-handle {
+  font-size: 0.85rem;
+  color: var(--text3);
+}
+
+.channel-subs-count {
+  font-size: 0.85rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.channel-sub-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  margin-left: auto;
+}
+
+.channel-sub-btn:hover { background: var(--accent2); box-shadow: 0 4px 16px rgba(124,58,237,0.35); }
+.channel-sub-btn.subbed { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+.channel-sub-btn.subbed:hover { border-color: var(--red); color: var(--red); }
+
+/* Tabs */
+.channel-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.ch-tab {
+  padding: 12px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  background: transparent;
+  border-top: none; border-left: none; border-right: none;
+}
+
+.ch-tab:hover { color: var(--text2); }
+.ch-tab.active { color: var(--text); border-bottom-color: var(--accent2); }
+
+.channel-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.channel-desc {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 0.875rem;
+  color: var(--text2);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.channel-desc.expanded { max-height: none; }
+.channel-desc-toggle {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.8rem;
+  color: var(--accent3);
+  cursor: pointer;
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/home" class="nav-logo">Nuvis</a>
+  <div class="nav-search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="nav-q" placeholder="動画を検索..." autocomplete="off">
+    <button onclick="doSearch()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+  <div class="nav-actions">
+    <a href="/history" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>履歴</span></a>
+    <a href="/favorites" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>お気に入り</span></a>
+    <a href="/subscriptions" class="nav-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg><span>登録チャンネル</span></a>
+    <a href="/settings" class="nav-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="channel-banner" id="ch-banner">
+    <img id="ch-banner-img" src="" alt="" style="display:none;" class="channel-banner-img">
+  </div>
+
+  <div class="channel-header">
+    <div class="channel-identity">
+      <div class="channel-avatar-xl" id="ch-avatar">?</div>
+      <div class="channel-identity-info">
+        <div class="channel-name-xl" id="ch-name">読み込み中...</div>
+        <div class="channel-meta-row">
+          <span class="channel-handle" id="ch-handle"></span>
+          <span class="channel-subs-count" id="ch-subs"></span>
+        </div>
+      </div>
+      <button class="channel-sub-btn" id="sub-btn" onclick="doSub()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+        <span id="sub-btn-text">登録</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="channel-header">
+    <div class="channel-tabs">
+      <button class="ch-tab active" onclick="switchTab('videos', this)">動画</button>
+      <button class="ch-tab" onclick="switchTab('about', this)">チャンネル情報</button>
+    </div>
+  </div>
+
+  <div class="channel-content">
+    <div id="tab-content">
+      <div class="loading-center"><div class="spinner"></div><span>読み込み中...</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="/nuvis.js"></script>
+<script>
+if (!requireAuth()) {}
+
+const pathParts = location.pathname.split('/');
+const channelId = pathParts[pathParts.length - 1];
+
+if (!channelId) window.location.href = '/home';
+
+let channelInfo = null;
+
+function doSearch() {
+  const q = document.getElementById('nav-q').value.trim();
+  if (q) window.location.href = `/search?v=${encodeURIComponent(q)}`;
+}
+document.getElementById('nav-q').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+
+function doSub() {
+  if (!channelInfo) return;
+  const ch = { id: channelId, name: channelInfo.author || channelInfo.name };
+  const added = toggleSubscription(ch);
+  updateSubBtn(added);
+}
+
+function updateSubBtn(isSubbed) {
+  const btn = document.getElementById('sub-btn');
+  const txt = document.getElementById('sub-btn-text');
+  btn.className = isSubbed ? 'channel-sub-btn subbed' : 'channel-sub-btn';
+  txt.textContent = isSubbed ? t('unsubscribe') : t('subscribe');
+}
+
+async function loadChannel() {
+  const info = await getChannelInfo(channelId);
+  if (!info) {
+    document.getElementById('ch-name').textContent = 'チャンネル情報を取得できませんでした';
+    return;
+  }
+
+  channelInfo = info.data;
+  const data = info.data;
+
+  document.title = (data.author || 'チャンネル') + ' - Nuvis';
+  document.getElementById('ch-name').textContent = data.author || '';
+  document.getElementById('ch-handle').textContent = data.authorUrl ? `@${data.authorUrl.replace('/c/','').replace('/user/','')}` : '';
+  document.getElementById('ch-subs').textContent = data.subCount ? `${formatViews(data.subCount)}人の登録者` : data.subCountText || '';
+  document.getElementById('ch-avatar').textContent = (data.author || '?').charAt(0).toUpperCase();
+
+  // Avatar image
+  const avatarImgs = data.authorThumbnails || data.avatar;
+  if (avatarImgs && avatarImgs.length) {
+    const img = document.createElement('img');
+    img.src = avatarImgs[avatarImgs.length-1]?.url || avatarImgs[0]?.url || '';
+    img.onerror = () => img.remove();
+    document.getElementById('ch-avatar').innerHTML = '';
+    document.getElementById('ch-avatar').appendChild(img);
+  }
+
+  // Banner
+  if (data.authorBanners && data.authorBanners.length) {
+    const bi = document.getElementById('ch-banner-img');
+    bi.src = data.authorBanners[0].url;
+    bi.style.display = 'block';
+  }
+
+  // Sub button state
+  updateSubBtn(isSubscribed(channelId));
+
+  // Load videos by default
+  loadVideosTab(data);
+}
+
+async function loadVideosTab(data) {
+  const cont = document.getElementById('tab-content');
+  cont.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+  const videos = await getChannelVideos(channelId);
+  cont.innerHTML = '';
+
+  if (!videos || !videos.length) {
+    cont.innerHTML = '<div class="empty-state"><span>動画が見つかりません</span></div>';
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'video-grid';
+  videos.slice(0, 30).forEach(v => {
+    const norm = normalizeVideo(v, 'invidious');
+    grid.appendChild(buildVideoCard(norm, () => {
+      addToHistory(norm);
+      window.location.href = `/watch?v=${norm.id}`;
+    }));
+  });
+  cont.appendChild(grid);
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.ch-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const cont = document.getElementById('tab-content');
+
+  if (tab === 'videos') {
+    if (channelInfo) loadVideosTab(channelInfo);
+  } else if (tab === 'about') {
+    cont.innerHTML = `
+      <div style="max-width:720px;">
+        <div class="channel-desc" id="ch-desc">${escapeHtml(channelInfo?.description || '説明なし')}</div>
+        <div class="channel-desc-toggle" onclick="toggleDesc()">もっと見る</div>
+        <div style="margin-top:20px;">
+          ${channelInfo?.totalViews ? `<p style="color:var(--text2);font-size:0.875rem;margin-bottom:8px;">総視聴回数: ${formatViews(channelInfo.totalViews)}</p>` : ''}
+          ${channelInfo?.joined ? `<p style="color:var(--text2);font-size:0.875rem;">参加日: ${formatDate(channelInfo.joined)}</p>` : ''}
+        </div>
+      </div>
+    `;
+  }
+}
+
+function toggleDesc() {
+  const d = document.getElementById('ch-desc');
+  if (d) d.classList.toggle('expanded');
+}
+
+loadChannel();
+</script>
+</body>
+</html>

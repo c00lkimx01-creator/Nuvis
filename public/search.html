@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuvis - 検索</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.main { padding-top: calc(var(--nav-h) + 12px); }
+
+.search-header {
+  padding: 20px 24px 0;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.search-result-bar {
+  font-size: 0.85rem;
+  color: var(--text3);
+  margin-bottom: 20px;
+}
+
+.search-result-bar strong { color: var(--text2); }
+
+.search-content {
+  padding: 0 24px 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Navbar search highlight for current query */
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/home" class="nav-logo">Nuvis</a>
+  <div class="nav-search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="nav-q" placeholder="動画を検索..." autocomplete="off">
+    <button onclick="doSearch()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+  <div class="nav-actions">
+    <a href="/history" class="nav-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span id="lbl-history">履歴</span>
+    </a>
+    <a href="/favorites" class="nav-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span id="lbl-fav">お気に入り</span>
+    </a>
+    <a href="/subscriptions" class="nav-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+      <span id="lbl-subs">登録チャンネル</span>
+    </a>
+    <a href="/settings" class="nav-btn-icon" title="設定">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="search-header">
+    <div class="search-result-bar" id="result-bar"></div>
+  </div>
+  <div class="search-content">
+    <div id="results-container">
+      <div class="loading-center">
+        <div class="spinner"></div>
+        <span>検索中...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/nuvis.js"></script>
+<script>
+if (!requireAuth()) {}
+
+const params = new URLSearchParams(location.search);
+const query = params.get('v') || '';
+
+document.title = query ? `${query} - Nuvis` : 'Nuvis - 検索';
+
+function applyLang() {
+  document.getElementById('nav-q').placeholder = t('searchPlaceholder');
+  document.getElementById('lbl-history').textContent = t('history');
+  document.getElementById('lbl-fav').textContent = t('favorites');
+  document.getElementById('lbl-subs').textContent = t('subscriptions');
+}
+applyLang();
+
+if (query) {
+  document.getElementById('nav-q').value = query;
+}
+
+function doSearch() {
+  const q = document.getElementById('nav-q').value.trim();
+  if (!q) return;
+  window.location.href = `/search?v=${encodeURIComponent(q)}`;
+}
+
+document.getElementById('nav-q').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+async function runSearch() {
+  if (!query) {
+    document.getElementById('results-container').innerHTML = `<div class="empty-state"><span>${t('noResults')}</span></div>`;
+    return;
+  }
+
+  const result = await searchVideos(query);
+  const container = document.getElementById('results-container');
+
+  if (!result || !result.data || !result.data.length) {
+    container.innerHTML = `<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><span>${t('noResults')}</span></div>`;
+    document.getElementById('result-bar').innerHTML = `「<strong>${escapeHtml(query)}</strong>」の検索結果`;
+    return;
+  }
+
+  const videos = result.data.map(v => normalizeVideo(v, result.source));
+  document.getElementById('result-bar').innerHTML = `「<strong>${escapeHtml(query)}</strong>」の検索結果 ${videos.length}件`;
+
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'video-grid';
+  videos.forEach(v => {
+    const card = buildVideoCard(v, () => {
+      addToHistory(v);
+      if (v.isShort) {
+        window.location.href = `/short?v=${v.id}`;
+      } else {
+        window.location.href = `/watch?v=${v.id}`;
+      }
+    });
+    grid.appendChild(card);
+  });
+  container.appendChild(grid);
+}
+
+runSearch();
+</script>
+</body>
+</html>

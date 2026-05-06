@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuvis - ログイン</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(124,58,237,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(192,132,252,0.1) 0%, transparent 50%),
+    var(--bg);
+}
+
+.login-grid {
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  padding: 48px 40px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,58,237,0.1);
+  animation: fadeUp 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(24px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.login-logo {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #9d5cff, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.login-tagline {
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.85rem;
+  margin-bottom: 36px;
+}
+
+.login-welcome {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrap input:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+
+.input-wrap input::placeholder { color: var(--text3); }
+
+.toggle-pw {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: var(--text3);
+  display: flex;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.toggle-pw:hover { color: var(--text2); }
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+  margin-top: 8px;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(124,58,237,0.45);
+}
+
+.login-btn:active { transform: translateY(0); }
+
+.login-error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #fca5a5;
+  margin-top: 14px;
+  display: none;
+}
+
+.login-error.show { display: block; }
+</style>
+</head>
+<body>
+<div class="login-bg"></div>
+<div class="login-grid"></div>
+
+<div class="login-card">
+  <div class="login-logo">Nuvis</div>
+  <div class="login-tagline">動画を発見・視聴・管理する</div>
+  <div class="login-welcome" id="welcome-text">Nuvisへようこそ</div>
+
+  <div class="input-group">
+    <label id="pw-label">パスワード</label>
+    <div class="input-wrap">
+      <input type="password" id="pw-input" placeholder="パスワードを入力" autocomplete="current-password">
+      <button class="toggle-pw" onclick="togglePw()" tabindex="-1">
+        <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+  <div class="login-error" id="login-error">パスワードが違います</div>
+</div>
+
+<script src="/nuvis.js"></script>
+<script>
+// If already logged in, redirect
+if (localStorage.getItem('nuvis-auth')) {
+  window.location.href = '/home';
+}
+
+function applyLang() {
+  document.getElementById('welcome-text').textContent = t('welcome');
+  document.getElementById('pw-label').textContent = t('password');
+  document.getElementById('login-btn').textContent = t('loginBtn');
+  document.getElementById('login-error').textContent = t('loginError');
+  document.getElementById('pw-input').placeholder = t('password');
+}
+applyLang();
+
+function togglePw() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === 'nuvis') {
+    localStorage.setItem('nuvis-auth', '1');
+    window.location.href = '/home';
+  } else {
+    document.getElementById('login-error').classList.add('show');
+    document.getElementById('pw-input').style.borderColor = 'var(--red)';
+    setTimeout(() => {
+      document.getElementById('pw-input').style.borderColor = '';
+    }, 2000);
+  }
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
